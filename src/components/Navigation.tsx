@@ -128,6 +128,8 @@ export default function Navigation() {
 
           {/* Desktop Nav Items */}
           <nav className="hidden md:flex items-center gap-8 text-[11px] font-bold tracking-widest uppercase">
+          <nav className="hidden md:flex items-center gap-8 text-[11px] font-bold tracking-widest uppercase">
+            {/* Directors Link & Dropdown */}
             <div
               className="relative py-2 cursor-pointer select-none"
               onMouseEnter={() => handleMouseEnter("directors")}
@@ -138,7 +140,37 @@ export default function Navigation() {
                 text="Directors"
                 className={`${activeSubMenu === "directors" ? "text-brand-blue" : "hover:text-brand-blue"}`}
               />
+              
+              <AnimatePresence>
+                {activeSubMenu === "directors" && (
+                  <div className="absolute top-full left-0 pt-4 flex flex-col gap-1 w-max z-[99]">
+                    {directors.map((item, index) => (
+                      <div key={item.slug} className="overflow-hidden">
+                        <motion.div
+                          initial={{ y: "128%" }}
+                          animate={{ y: "0%" }}
+                          exit={{ y: "128%" }}
+                          transition={{
+                            duration: 0.6,
+                            ease: [0.76, 0, 0.24, 1],
+                            delay: index * 0.02,
+                          }}
+                        >
+                          <Link
+                            href={`/directors/${item.slug}`}
+                            className="block py-1 text-[11px] font-bold uppercase tracking-wider text-white opacity-35 hover:text-brand-blue hover:opacity-100 transition-all duration-200"
+                          >
+                            <ScrambleText text={item.name} isHovered={true} />
+                          </Link>
+                        </motion.div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </AnimatePresence>
             </div>
+
+            {/* Collaborators Link & Dropdown */}
             <div
               className="relative py-2 cursor-pointer select-none"
               onMouseEnter={() => handleMouseEnter("collaborators")}
@@ -149,7 +181,36 @@ export default function Navigation() {
                 text="Collaborators"
                 className={`${activeSubMenu === "collaborators" ? "text-brand-blue" : "hover:text-brand-blue"}`}
               />
+
+              <AnimatePresence>
+                {activeSubMenu === "collaborators" && (
+                  <div className="absolute top-full left-0 pt-4 flex flex-col gap-1 w-max z-[99]">
+                    {collaborators.map((item, index) => (
+                      <div key={item.slug} className="overflow-hidden">
+                        <motion.div
+                          initial={{ y: "128%" }}
+                          animate={{ y: "0%" }}
+                          exit={{ y: "128%" }}
+                          transition={{
+                            duration: 0.6,
+                            ease: [0.76, 0, 0.24, 1],
+                            delay: index * 0.02,
+                          }}
+                        >
+                          <Link
+                            href={`/collaborators/${item.slug}`}
+                            className="block py-1 text-[11px] font-bold uppercase tracking-wider text-white opacity-35 hover:text-brand-blue hover:opacity-100 transition-all duration-200"
+                          >
+                            <ScrambleText text={item.name} isHovered={true} />
+                          </Link>
+                        </motion.div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </AnimatePresence>
             </div>
+
             <ScrambleLink
               href="https://overturestudios.com/"
               target="_blank"
@@ -174,50 +235,6 @@ export default function Navigation() {
           </button>
         </div>
       </header>
-
-      {/* Roster lists positioned vertically on the left side, matching design requirements */}
-      <AnimatePresence>
-        {activeSubMenu && (
-          <div
-            data-directors-list={`/${activeSubMenu}`}
-            onMouseEnter={() => {
-              if (timerRef.current) clearTimeout(timerRef.current);
-            }}
-            onMouseLeave={handleMouseLeave}
-            className="hidden md:block"
-          >
-            {(activeSubMenu === "directors" ? directors : collaborators).map((item, index) => {
-              const topOffset = `${3.5 + index * 1.5}rem`;
-              return (
-                <nav
-                  key={item.slug}
-                  className="pointer-events-none fixed left-0 z-40 overflow-hidden px-8 mix-blend-difference hover:mix-blend-normal"
-                  style={{ top: topOffset, left: "2rem" }}
-                >
-                  <motion.div
-                    initial={{ y: "128%" }}
-                    animate={{ y: "0%" }}
-                    exit={{ y: "128%" }}
-                    transition={{
-                      duration: 0.8,
-                      ease: [0.76, 0, 0.24, 1],
-                      delay: index * 0.03,
-                    }}
-                    className="overflow-hidden"
-                  >
-                    <Link
-                      href={`/${activeSubMenu}/${item.slug}`}
-                      className="type-small-bold pointer-events-auto inline-block py-1 text-[11px] font-bold uppercase tracking-wider text-white opacity-30 hover:text-brand-blue hover:opacity-100 transition-all duration-200"
-                    >
-                      <ScrambleText text={item.name} isHovered={true} />
-                    </Link>
-                  </motion.div>
-                </nav>
-              );
-            })}
-          </div>
-        )}
-      </AnimatePresence>
 
       {/* Fullscreen Mobile Menu Overlay */}
       <AnimatePresence>

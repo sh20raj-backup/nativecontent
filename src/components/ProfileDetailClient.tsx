@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Navigation from "./Navigation";
 import InteractiveCanvas from "./InteractiveCanvas";
@@ -34,6 +34,35 @@ interface ProfileDetailClientProps {
 export default function ProfileDetailClient({ name, slug, type }: ProfileDetailClientProps) {
   const [showInfo, setShowInfo] = useState(false);
   const works = worksMap[slug] || worksMap.default;
+  const rightColumnRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const container = rightColumnRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const singleSetHeight = container.scrollHeight / 3;
+      // Seamlessly wrap from bottom of 2nd set back to 1st set
+      if (container.scrollTop >= singleSetHeight * 2) {
+        container.scrollTop = container.scrollTop - singleSetHeight;
+      }
+      // Seamlessly wrap from top of 2nd set into 3rd set
+      else if (container.scrollTop <= singleSetHeight * 0.5) {
+        container.scrollTop = container.scrollTop + singleSetHeight;
+      }
+    };
+
+    const initTimer = setTimeout(() => {
+      const singleSetHeight = container.scrollHeight / 3;
+      container.scrollTop = singleSetHeight;
+      container.addEventListener("scroll", handleScroll);
+    }, 100);
+
+    return () => {
+      clearTimeout(initTimer);
+      container.removeEventListener("scroll", handleScroll);
+    };
+  }, [works]);
 
   // Split name to display first and last name in separate lines
   const nameParts = name.split(" ");
@@ -129,15 +158,18 @@ export default function ProfileDetailClient({ name, slug, type }: ProfileDetailC
         </div>
 
         {/* Right Section: Scrollable Portfolio Columns */}
-        <div className="md:col-span-5 py-16 px-6 md:py-24 md:px-12 flex flex-col gap-12 overflow-y-auto md:max-h-screen h-auto md:h-screen scrollbar-thin">
-          {works.map((work, idx) => (
+        <div
+          ref={rightColumnRef}
+          className="md:col-span-5 py-16 px-6 md:py-24 md:px-12 flex flex-col gap-12 overflow-y-auto md:max-h-screen h-auto md:h-screen scrollbar-none"
+        >
+          {[...works, ...works, ...works].map((work, idx) => (
             <motion.div
               key={idx}
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.6, ease: "easeOut" }}
-              className="group flex flex-col gap-3"
+              className="group flex flex-col gap-3 shrink-0"
             >
               {/* Media Frame */}
               <div className="aspect-video w-full rounded-xl overflow-hidden bg-black relative border border-white/5">
