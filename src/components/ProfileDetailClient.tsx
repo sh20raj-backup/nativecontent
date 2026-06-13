@@ -36,18 +36,30 @@ export default function ProfileDetailClient({ name, slug, type }: ProfileDetailC
   const works = worksMap[slug] || worksMap.default;
   const rightColumnRef = useRef<HTMLDivElement>(null);
 
+  // Build base roster of at least 8 items so scroll heights are large enough for seamless warping
+  let baseWorks = [...works];
+  if (baseWorks.length > 0) {
+    while (baseWorks.length < 8) {
+      baseWorks = [...baseWorks, ...works];
+    }
+  }
+  const displayWorks = [...baseWorks, ...baseWorks, ...baseWorks];
+
   useEffect(() => {
     const container = rightColumnRef.current;
     if (!container) return;
 
     const handleScroll = () => {
       const singleSetHeight = container.scrollHeight / 3;
-      // Seamlessly wrap from bottom of 2nd set back to 1st set
-      if (container.scrollTop >= singleSetHeight * 2) {
+      const clientHeight = container.clientHeight;
+      const maxScroll = container.scrollHeight - clientHeight;
+
+      // Wrap back up if we get within one viewport height of the bottom
+      if (container.scrollTop >= maxScroll - clientHeight) {
         container.scrollTop = container.scrollTop - singleSetHeight;
       }
-      // Seamlessly wrap from top of 2nd set into 3rd set
-      else if (container.scrollTop <= singleSetHeight * 0.5) {
+      // Wrap back down if we get within one viewport height of the top
+      else if (container.scrollTop <= clientHeight) {
         container.scrollTop = container.scrollTop + singleSetHeight;
       }
     };
@@ -162,7 +174,7 @@ export default function ProfileDetailClient({ name, slug, type }: ProfileDetailC
           ref={rightColumnRef}
           className="md:col-span-5 py-16 px-6 md:py-24 md:px-12 flex flex-col gap-12 overflow-y-auto md:max-h-screen h-auto md:h-screen scrollbar-none"
         >
-          {[...works, ...works, ...works].map((work, idx) => (
+          {displayWorks.map((work, idx) => (
             <motion.div
               key={idx}
               initial={{ opacity: 0, y: 40 }}

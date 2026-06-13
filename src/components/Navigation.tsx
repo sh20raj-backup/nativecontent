@@ -128,7 +128,6 @@ export default function Navigation() {
 
           {/* Desktop Nav Items */}
           <nav className="hidden md:flex items-center gap-8 text-[11px] font-bold tracking-widest uppercase">
-          <nav className="hidden md:flex items-center gap-8 text-[11px] font-bold tracking-widest uppercase">
             {/* Directors Link & Dropdown */}
             <div
               className="relative py-2 cursor-pointer select-none"
